@@ -13,7 +13,7 @@ struct Command{
 
 class autoBuilder{
 	public:
-		autoBuilder(std::vector<Command> commands, pros::Controller controller, lemlib::Chassis* chassis, bool startingState);
+		autoBuilder(std::vector<Command> commands, pros::Controller controller, lemlib::Chassis* chassis, bool startingState = false);
         void init();
         void setFlag(bool state);
 		void run();
