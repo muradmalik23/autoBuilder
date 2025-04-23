@@ -41,6 +41,7 @@
  */
 #include "lemlib/api.hpp" 
 #include "subsystems/devices.hpp"
+#include "autoBuilder.hpp"
 //#include "okapi/api.hpp"
 
 /**
