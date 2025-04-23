@@ -24,6 +24,6 @@ private:
   const std::vector<Command> commands;
   pros::Controller controller;
   lemlib::Chassis *chassis;
-  volatile lemlib::Pose chassisPose = chassis->getPose();
+  lemlib::Pose chassisPose = chassis->getPose();
   bool flag;
 };
