@@ -1,19 +1,7 @@
 #include "main.h"
-#include "fmt/format.h"
-#include "pros/misc.h"
-#include <cstdio>
-#include <format>
-#include <functional>
-#include <vector>
-//aliases for cleanliness
+
 lemlib::Pose chassisPose = chassis.getPose();
 
-struct Command{
-	std::string name;
-	std::function<std::string()> codeGen;
-};
-
-int abIndex = 0;
 std::vector<Command> commands = {
     {"Point Fwd", []() {
         return std::format("chassis.moveToPoint(%f, %f, 1500, {.maxSpeed = 100, .minSpeed = 20, .earlyExitRange = .05}, false);", chassisPose.x, chassisPose.y);
@@ -62,31 +50,8 @@ std::vector<Command> commands = {
     }}
 };
 
+autoBuilder autoBuilder(commands, controller, &chassis, true);
 
-void autoBuilder(){
-	controller.clear();
-	controller.print(1, 1, "AutoBuilder Active.");
-	controller.print(2, 1, "Action:");
-
-	while (true) {
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-			abIndex = (abIndex - 1 + commands.size()) % commands.size(); // Wrap around
-		}
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
-			abIndex = (abIndex + 1) % commands.size();
-		}
-	
-		controller.print(3, 1, "%s", commands[abIndex].name);
-	
-		if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-		  controller.rumble(".");
-		  printf("%s", fmt::to_string(commands[abIndex].codeGen).c_str());
-		  printf("\n");
-		}
-	
-		pros::delay(100);
-	  }
-}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -102,15 +67,7 @@ void disabled() {}
  * to keep execution time for this mode under a few seconds.
  */
  void initialize() {
-	printf(R"(
-		d8888b. d88  dP   dP d88888P M""""""""`M                        dP               dP                oo dP       dP                   
-			`88  88  88   88     d8' Mmmmmm   .M                        88               88                   88       88                   
-		.aaadP'  88  88aaa88    d8'  MMMMP  .MMM    .d8888b. dP    dP d8888P .d8888b.    88d888b. dP    dP dP 88 .d888b88 .d8888b. 88d888b. 
-		88'      88       88   d8'   MMP  .MMMMM    88'  `88 88    88   88   88'  `88    88'  `88 88    88 88 88 88'  `88 88ooood8 88'  `88 
-		88.      88       88  d8'    M' .MMMMMMM    88.  .88 88.  .88   88   88.  .88    88.  .88 88.  .88 88 88 88.  .88 88.  ... 88       
-		Y88888P d88P      dP d8'     M         M    `88888P8 `88888P'   dP   `88888P'    88Y8888' `88888P' dP dP `88888P8 `88888P' dP     
-		
-		)");
+
 }
 
 /**
@@ -151,7 +108,7 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	autoBuilder();
+	autoBuilder.run();
 	while (true) {
 		pros::delay(20);                               // Run for 20 ms then update
 	}
