@@ -1,6 +1,4 @@
 #pragma once
-
-#include "fmt/format.h"
 #include "lemlib/chassis/chassis.hpp"
 #include "pros/misc.hpp"
 #include "robodash/views/console.hpp"

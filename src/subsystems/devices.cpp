@@ -1,4 +1,3 @@
-#include "liblvgl/draw/lv_img_buf.h"
 #include "main.h"
 #include "robodash/views/console.hpp"
 #include "robodash/views/image.hpp"
@@ -6,8 +5,7 @@
 Controller controller(E_CONTROLLER_MASTER);
 
 rd::Console console ("Terminal");
-extern const lv_img_dsc_t logo;
-rd::Image logoScreen(&logo, "Logo" );
+rd::Image logoScreen("S:/usd/image.bin", "Logo" );
 
 Intake intake(7, 8, 14, {350, 10}, {215, 230}, 150, neutral, .01);
 Lift lift(-9, 15, 750, 0, 500, {0, .08, .44, .50}, .01);

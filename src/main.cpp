@@ -1,9 +1,6 @@
 #include "main.h"
 #include "autoBuilder.hpp"
-#include "lemlib/chassis/chassis.hpp"
-#include "pros/rtos.h"
 #include <format>
-#include <stdio.h>
 #include <vector>
 
 lemlib::MoveToPointParams regularpoint = {.maxSpeed = 100, .minSpeed = 20, .earlyExitRange = .05};
