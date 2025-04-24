@@ -1,56 +1,76 @@
 #include "main.h"
+#include "autoBuilder.hpp"
+#include "lemlib/chassis/chassis.hpp"
+#include "pros/rtos.h"
+#include <format>
+#include <stdio.h>
+#include <vector>
 
-lemlib::Pose chassisPose = chassis.getPose();
+lemlib::MoveToPointParams regularpoint = {.maxSpeed = 100, .minSpeed = 20, .earlyExitRange = .05};
+lemlib::MoveToPoseParams regularpose = {.minSpeed = 20, .earlyExitRange = .05};
+lemlib::MoveToPointParams reverseRegular = {.forwards = false, .minSpeed = 20, .earlyExitRange = .05};
+lemlib::MoveToPointParams goal = {.forwards = false, .minSpeed = 50, .earlyExitRange = .05};
+lemlib::MoveToPoseParams goalPose = {.forwards = false, .minSpeed = 50, .earlyExitRange = .05};
+lemlib::TurnToPointParams regularTurn = {.minSpeed = 20, .earlyExitRange = .05};
+lemlib::TurnToPointParams reverseTurn = {.forwards = false, .minSpeed = 20, .earlyExitRange = .05};
+lemlib::TurnToHeadingParams headingTurn = {.minSpeed = 20, .earlyExitRange = .05};
 
 std::vector<Command> commands = {
-    {"Point Fwd", []() {
-        return std::format("chassis.moveToPoint(%f, %f, 1500, {.maxSpeed = 100, .minSpeed = 20, .earlyExitRange = .05}, false);", chassisPose.x, chassisPose.y);
-    }},
-    {"Point Rev", []() {
-        return std::format("chassis.moveToPoint(%f, %f, 1500, {.forwards = false, .minSpeed = 20, .earlyExitRange = .05}, false);", chassisPose.x, chassisPose.y);
-    }},
-    {"Point Goal", []() {
-        return std::format("chassis.moveToPoint(%f, %f, 1500, {.forwards = false, .minSpeed = 50, .earlyExitRange = .05}), false;", chassisPose.x, chassisPose.y);
-    }},
-    {"Pose Fwd", []() {
-        return std::format("chassis.moveToPose(%f, %f, %f, 1500, {.minSpeed = 20, .earlyExitRange = .05}, false);", chassisPose.x, chassisPose.y, chassisPose.theta);
-    }},
-    {"Pose Goal", []() {
-        return std::format("chassis.moveToPose(%f, %f, %f, 1500, {.forwards = false, .minSpeed = 50, .earlyExitRange = .05}, false);", chassisPose.x, chassisPose.y, chassisPose.theta);
-    }},
-    {"Point Turn Fwd", []() {
-        return std::format("chassis.turnToPoint(%f, %f, 1500, {.minSpeed = 20, .earlyExitRange = .05}, false);", chassisPose.x, chassisPose.y);
-    }},
-    {"Point Turn Rev", []() {
-        return std::format("chassis.turnToPoint(%f, %f, 1500, {.forwards = false, .minSpeed = 20, .earlyExitRange = .05}, false);", chassisPose.x, chassisPose.y);
-    }},
-    {"Heading Turn", []() {
-        return std::format("chassis.turnToHeading(%f, 500, {}, false);", chassisPose.theta);
-    }},
-    {"Intake", []() {
-        return "intake.move(127);";
-    }},
-    {"Outtake", []() {
-        return "intake.move(-127);";
-    }},
-    {"Stop Intake", []() {
-        return "intake.move(0);";
-    }},
-    {"Clamp", []() {
-        return "clamp.set_value(true);";
-    }},
-    {"Unclamp", []() {
-        return "clamp.set_value(false);";
-    }},
-    {"Sweeper Down", []() {
-        return "sweeper.set_value(true);";
-    }},
-    {"Sweeper Up", []() {
-        return "sweeper.set_value(false);";
-    }}
-};
+    {"Point Fwd",
+     []() {
+       return std::format(
+           "chassis.moveToPoint({}, {}, 1500, regularPoint, false);",
+           chassis.getPose().x, chassis.getPose().y);
+     }},
+    {"Point Rev",
+     []() {
+       return std::format(
+           "chassis.moveToPoint({}, {}, 1500, reverseRegular, false);",
+           chassis.getPose().x, chassis.getPose().y);
+     }},
+    {"Point Goal",
+     []() {
+       return std::format("chassis.moveToPoint({}, {}, 1500, goal), false;",
+                          chassis.getPose().x, chassis.getPose().y);
+     }},
+    {"Pose Fwd",
+     []() {
+       return std::format(
+           "chassis.moveToPose({}, {}, {}, 1500, regularPose, false);",
+           chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
+     }},
+    {"Pose Goal",
+     []() {
+       return std::format(
+           "chassis.moveToPose({}, {}, {}, 1500, goalPose, false);",
+           chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
+     }},
+    {"Point Turn Fwd",
+     []() {
+       return std::format(
+           "chassis.turnToPoint({}, {}, 1500, regularTurn, false);",
+           chassis.getPose().x, chassis.getPose().y);
+     }},
+    {"Point Turn Rev",
+     []() {
+       return std::format(
+           "chassis.turnToPoint({}, {}, 1500, reverseTurn, false);",
+           chassis.getPose().x, chassis.getPose().y);
+     }},
+    {"Heading Turn",
+     []() {
+       return std::format("chassis.turnToHeading({}, 500, headingTurn, false);",
+                          chassis.getPose().theta);
+     }},
+    {"Intake", []() { return "intake.move(127);"; }},
+    {"Outtake", []() { return "intake.move(-127);"; }},
+    {"Stop Intake", []() { return "intake.move(0);"; }},
+    {"Clamp", []() { return "clamp.set_value(true);"; }},
+    {"Unclamp", []() { return "clamp.set_value(false);"; }},
+    {"Sweeper Down", []() { return "sweeper.set_value(true);"; }},
+    {"Sweeper Up", []() { return "sweeper.set_value(false);"; }}};
 
-autoBuilder autoBuilder(commands, controller, &chassis, true);
+autoBuilder autoBuilder(commands, controller, &chassis, &console, &logoScreen, true);
 
 
 /**
@@ -68,6 +88,7 @@ void disabled() {}
  */
 void initialize() {
     autoBuilder.init();
+    chassis.calibrate();
 }
 
 /**
@@ -110,6 +131,9 @@ void autonomous() {}
 void opcontrol() {
 	autoBuilder.run();
 	while (true) {
-		pros::delay(20);                               // Run for 20 ms then update
+        // printf("%f, %f, %f \n", chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
+        // c::delay(500);
+
+        pros::delay(20);                               // Run for 20 ms then update
 	}
 }

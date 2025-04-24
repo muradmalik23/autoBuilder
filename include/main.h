@@ -40,6 +40,7 @@
  * You should add more #includes here
  */
 #include "lemlib/api.hpp" 
+#include "robodash/api.h"
 #include "subsystems/devices.hpp"
 #include "autoBuilder.hpp"
 //#include "okapi/api.hpp"

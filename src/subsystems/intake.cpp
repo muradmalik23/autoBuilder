@@ -110,11 +110,11 @@ void Intake::driverControl() {
   } else if (currentState == regular) {
     brake();
   }
-  if(currentAlliance == neutral){
-    controller.set_text(2, 0, "Color Sort: Off");
-  } else{
-		controller.set_text(2, 0, "Color Sort: On ");
-  }
+  // if(currentAlliance == neutral){
+  //   controller.set_text(2, 0, "Color Sort: Off");
+  // } else{
+	// 	controller.set_text(2, 0, "Color Sort: On ");
+  // }
 }
 
 Alliance Intake::getAlliance(){
