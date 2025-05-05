@@ -12,7 +12,7 @@ lemlib::TurnToPointParams regularTurn = {.minSpeed = 20, .earlyExitRange = .05};
 lemlib::TurnToPointParams reverseTurn = {.forwards = false, .minSpeed = 20, .earlyExitRange = .05};
 lemlib::TurnToHeadingParams headingTurn = {.minSpeed = 20, .earlyExitRange = .05};
 
-std::vector<Command> commands = {
+std::vector<autoBuilder::Command> commands = {
     {"Point Fwd",
      []() {
        return std::format(
@@ -67,7 +67,7 @@ std::vector<Command> commands = {
     {"Sweeper Down", []() { return "sweeper.set_value(true);"; }},
     {"Sweeper Up", []() { return "sweeper.set_value(false);"; }}};
 
-autoBuilder autoBuilder(commands, controller, &chassis, &console, &logoScreen, true);
+autoBuilder autoBuilder(commands, controller, &console, &logoScreen, true);
 
 
 /**

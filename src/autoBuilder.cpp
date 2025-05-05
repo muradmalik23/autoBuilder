@@ -5,9 +5,9 @@
 #include <string>
 
 autoBuilder::autoBuilder(std::vector<Command> commands,
-                         pros::Controller controller, lemlib::Chassis *chassis, rd::Console *console, rd::Image *image,
+                         pros::Controller controller, rd::Console *console, rd::Image *image,
                          bool startingState)
-    : commands(commands), controller(controller), chassis(chassis), console(console), image(image),
+    : commands(commands), controller(controller), console(console), image(image),
       flag(startingState) {}
 
 void autoBuilder::init() {
@@ -28,11 +28,7 @@ Y88888P d88P      dP d8'     M         M    `88888P8 `88888P'   dP   `88888P'   
 }
 
 void autoBuilder::run() {
-  if (!flag) {
-    return;
-  }
-
-  while (true) {
+  while (flag) {
 
     if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
       controllerIndex = (controllerIndex - 1 + commands.size()) % commands.size();
