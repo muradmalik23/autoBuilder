@@ -1,6 +1,5 @@
 #include "main.h"
 #include "autoBuilder.hpp"
-#include <format>
 #include <vector>
 
 lemlib::MoveToPointParams regularPoint = {.maxSpeed = 100, .minSpeed = 20, .earlyExitRange = .05};
@@ -12,62 +11,30 @@ lemlib::TurnToPointParams regularTurn = {.minSpeed = 20, .earlyExitRange = .05};
 lemlib::TurnToPointParams reverseTurn = {.forwards = false, .minSpeed = 20, .earlyExitRange = .05};
 lemlib::TurnToHeadingParams headingTurn = {.minSpeed = 20, .earlyExitRange = .05};
 
-std::vector<autoBuilder::Command> commands = {
-    {"Point Fwd",
-     []() {
-       return std::format(
-           "chassis.moveToPoint({}, {}, 1500, regularPoint, false);",
-           chassis.getPose().x, chassis.getPose().y);
-     }},
-    {"Point Rev",
-     []() {
-       return std::format(
-           "chassis.moveToPoint({}, {}, 1500, reverseRegular, false);",
-           chassis.getPose().x, chassis.getPose().y);
-     }},
-    {"Point Goal",
-     []() {
-       return std::format("chassis.moveToPoint({}, {}, 1500, goal, false);",
-                          chassis.getPose().x, chassis.getPose().y);
-     }},
-    {"Pose Fwd",
-     []() {
-       return std::format(
-           "chassis.moveToPose({}, {}, {}, 1500, regularPose, false);",
-           chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
-     }},
-    {"Pose Goal",
-     []() {
-       return std::format(
-           "chassis.moveToPose({}, {}, {}, 1500, goalPose, false);",
-           chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
-     }},
-    {"Point Turn Fwd",
-     []() {
-       return std::format(
-           "chassis.turnToPoint({}, {}, 1500, regularTurn, false);",
-           chassis.getPose().x, chassis.getPose().y);
-     }},
-    {"Point Turn Rev",
-     []() {
-       return std::format(
-           "chassis.turnToPoint({}, {}, 1500, reverseTurn, false);",
-           chassis.getPose().x, chassis.getPose().y);
-     }},
-    {"Heading Turn",
-     []() {
-       return std::format("chassis.turnToHeading({}, 500, headingTurn, false);",
-                          chassis.getPose().theta);
-     }},
-    {"Intake", []() { return "intake.move(127);"; }},
-    {"Outtake", []() { return "intake.move(-127);"; }},
-    {"Stop Intake", []() { return "intake.move(0);"; }},
-    {"Clamp", []() { return "clamp.set_value(true);"; }},
-    {"Unclamp", []() { return "clamp.set_value(false);"; }},
-    {"Sweeper Down", []() { return "sweeper.set_value(true);"; }},
-    {"Sweeper Up", []() { return "sweeper.set_value(false);"; }}};
+// Everything templates can reference as {key}. Add other subsystems here.
+autoBuilder::State snapshot() {
+  auto p = chassis.getPose();
+  return {{"x", p.x}, {"y", p.y}, {"theta", p.theta}};
+}
 
-autoBuilder builder(commands, &controller, &console, &logoScreen, true);
+std::vector<autoBuilder::Command> commands = {
+    {"Point Fwd",      "chassis.moveToPoint({x}, {y}, 1500, regularPoint, false);"},
+    {"Point Rev",      "chassis.moveToPoint({x}, {y}, 1500, reverseRegular, false);"},
+    {"Point Goal",     "chassis.moveToPoint({x}, {y}, 1500, goal, false);"},
+    {"Pose Fwd",       "chassis.moveToPose({x}, {y}, {theta}, 1500, regularPose, false);"},
+    {"Pose Goal",      "chassis.moveToPose({x}, {y}, {theta}, 1500, goalPose, false);"},
+    {"Point Turn Fwd", "chassis.turnToPoint({x}, {y}, 1500, regularTurn, false);"},
+    {"Point Turn Rev", "chassis.turnToPoint({x}, {y}, 1500, reverseTurn, false);"},
+    {"Heading Turn",   "chassis.turnToHeading({theta}, 500, headingTurn, false);"},
+    {"Intake",         "intake.move(127);"},
+    {"Outtake",        "intake.move(-127);"},
+    {"Stop Intake",    "intake.move(0);"},
+    {"Clamp",          "clamp.set_value(true);"},
+    {"Unclamp",        "clamp.set_value(false);"},
+    {"Sweeper Down",   "sweeper.set_value(true);"},
+    {"Sweeper Up",     "sweeper.set_value(false);"}};
+
+autoBuilder builder(commands, &controller, &console, &logoScreen, snapshot, true);
 
 
 /**

@@ -6,8 +6,9 @@
 
 autoBuilder::autoBuilder(std::vector<Command> commands,
                          pros::Controller *controller, rd::Console *console, rd::Image *image,
+                         std::function<State()> snapshot,
                          bool startingState)
-    : commands(commands), controller(controller), console(console), image(image),
+    : commands(commands), controller(controller), console(console), image(image), snapshot(snapshot),
       flag(startingState) {}
 
 void autoBuilder::init() {
@@ -42,13 +43,32 @@ void autoBuilder::run() {
 
     if (controller->get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
       controller->rumble(".");
-      std::string code = commands[controllerIndex].codeGen();
+      std::string code = render(commands[controllerIndex].tpl);
       printf("%s\n", code.c_str());
       console->printf("%s\n", code.c_str());
     }
 
     pros::delay(100);
   }
+}
+
+// Replaces each {key} with its value from one fresh snapshot; unknown keys stay as-is.
+std::string autoBuilder::render(const std::string &tpl) {
+  State state = snapshot();
+  std::string out;
+  for (size_t i = 0; i < tpl.size();) {
+    size_t end = tpl[i] == '{' ? tpl.find('}', i) : std::string::npos;
+    auto it = end == std::string::npos ? state.end() : state.find(tpl.substr(i + 1, end - i - 1));
+    if (it == state.end()) {
+      out += tpl[i++];
+      continue;
+    }
+    char buf[32];
+    snprintf(buf, sizeof buf, "%.2f", it->second);
+    out += buf;
+    i = end + 1;
+  }
+  return out;
 }
 
 void autoBuilder::setFlag(bool state) { flag = state; }

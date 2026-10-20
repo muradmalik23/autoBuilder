@@ -6,6 +6,7 @@
 #include <functional>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 
 
@@ -15,11 +16,15 @@ class autoBuilder {
 
     struct Command {
       std::string name;
-      std::function<std::string()> codeGen;
+      std::string tpl; // e.g. "go({x}, {y});" - {key} filled from the snapshot
     };
 
+    // name -> value, read fresh on every button press
+    using State = std::unordered_map<std::string, double>;
+
     autoBuilder(std::vector<Command> commands, pros::Controller *controller,
-                rd::Console* console, rd::Image* image, bool startingState = false);
+                rd::Console* console, rd::Image* image, std::function<State()> snapshot,
+                bool startingState = false);
     
     void init();
     void setFlag(bool state);
@@ -31,5 +36,7 @@ class autoBuilder {
     pros::Controller *controller;
     rd::Console *console;
     rd::Image *image;
+    std::function<State()> snapshot;
+    std::string render(const std::string &tpl);
     bool flag;
 };
