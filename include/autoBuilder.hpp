@@ -4,6 +4,7 @@
 #include "robodash/views/console.hpp"
 #include "robodash/views/image.hpp"
 #include <functional>
+#include <vector>
 #include <string>
 
 
@@ -17,7 +18,7 @@ class autoBuilder {
       std::function<std::string()> codeGen;
     };
 
-    autoBuilder(std::vector<Command> commands, pros::Controller controller,
+    autoBuilder(std::vector<Command> commands, pros::Controller *controller,
                 rd::Console* console, rd::Image* image, bool startingState = false);
     
     void init();
@@ -27,7 +28,7 @@ class autoBuilder {
   private:
     int controllerIndex = 0;
     std::vector<Command> commands;
-    pros::Controller controller;
+    pros::Controller *controller;
     rd::Console *console;
     rd::Image *image;
     bool flag;

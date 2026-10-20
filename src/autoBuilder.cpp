@@ -5,15 +5,15 @@
 #include <string>
 
 autoBuilder::autoBuilder(std::vector<Command> commands,
-                         pros::Controller controller, rd::Console *console, rd::Image *image,
+                         pros::Controller *controller, rd::Console *console, rd::Image *image,
                          bool startingState)
     : commands(commands), controller(controller), console(console), image(image),
       flag(startingState) {}
 
 void autoBuilder::init() {
-  controller.clear();
+  controller->clear();
   pros::delay(50);
-  controller.print(0, 0, "autoBuilder on!");
+  controller->print(0, 0, "autoBuilder on!");
   image->focus();
   console->clear();
   printf(R"(
@@ -28,27 +28,23 @@ Y88888P d88P      dP d8'     M         M    `88888P8 `88888P'   dP   `88888P'   
 }
 
 void autoBuilder::run() {
+  controller->print(2, 0, "%-16s", commands[controllerIndex].name.c_str());
   while (flag) {
 
-    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+    if (controller->get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
       controllerIndex = (controllerIndex - 1 + commands.size()) % commands.size();
-      controller.clear_line(2);
-      controller.set_text(2, 0, commands[controllerIndex].name);
-
+      controller->print(2, 0, "%-16s", commands[controllerIndex].name.c_str());
     }
-    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+    if (controller->get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
       controllerIndex = (controllerIndex + 1) % commands.size();
-      controller.clear_line(2);
-      controller.set_text(2, 0, commands[controllerIndex].name);
-
+      controller->print(2, 0, "%-16s", commands[controllerIndex].name.c_str());
     }
 
-    controller.print(2, 0, "%s", commands[controllerIndex].name);
-
-    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-      controller.rumble(".");
-      printf("%s\n", commands[controllerIndex].codeGen().c_str());
-      console->printf("%s\n", commands[controllerIndex].codeGen().c_str());
+    if (controller->get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+      controller->rumble(".");
+      std::string code = commands[controllerIndex].codeGen();
+      printf("%s\n", code.c_str());
+      console->printf("%s\n", code.c_str());
     }
 
     pros::delay(100);

@@ -3,8 +3,8 @@
 #include <format>
 #include <vector>
 
-lemlib::MoveToPointParams regularpoint = {.maxSpeed = 100, .minSpeed = 20, .earlyExitRange = .05};
-lemlib::MoveToPoseParams regularpose = {.minSpeed = 20, .earlyExitRange = .05};
+lemlib::MoveToPointParams regularPoint = {.maxSpeed = 100, .minSpeed = 20, .earlyExitRange = .05};
+lemlib::MoveToPoseParams regularPose = {.minSpeed = 20, .earlyExitRange = .05};
 lemlib::MoveToPointParams reverseRegular = {.forwards = false, .minSpeed = 20, .earlyExitRange = .05};
 lemlib::MoveToPointParams goal = {.forwards = false, .minSpeed = 50, .earlyExitRange = .05};
 lemlib::MoveToPoseParams goalPose = {.forwards = false, .minSpeed = 50, .earlyExitRange = .05};
@@ -27,7 +27,7 @@ std::vector<autoBuilder::Command> commands = {
      }},
     {"Point Goal",
      []() {
-       return std::format("chassis.moveToPoint({}, {}, 1500, goal), false;",
+       return std::format("chassis.moveToPoint({}, {}, 1500, goal, false);",
                           chassis.getPose().x, chassis.getPose().y);
      }},
     {"Pose Fwd",
@@ -67,7 +67,7 @@ std::vector<autoBuilder::Command> commands = {
     {"Sweeper Down", []() { return "sweeper.set_value(true);"; }},
     {"Sweeper Up", []() { return "sweeper.set_value(false);"; }}};
 
-autoBuilder autoBuilder(commands, controller, &console, &logoScreen, true);
+autoBuilder builder(commands, &controller, &console, &logoScreen, true);
 
 
 /**
@@ -84,7 +84,7 @@ void disabled() {}
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    autoBuilder.init();
+    builder.init();
     chassis.calibrate();
 }
 
@@ -126,7 +126,7 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	autoBuilder.run();
+	builder.run();
 	while (true) {
         // printf("%f, %f, %f \n", chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
         // c::delay(500);
